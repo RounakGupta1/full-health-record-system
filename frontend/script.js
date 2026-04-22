@@ -1,16 +1,4 @@
-const BASE = (() => {
-    const saved = localStorage.getItem("apiBaseUrl");
-
-    if(saved){
-        return saved.replace(/\/$/, "");
-    }
-
-    if(window.location.protocol === "file:"){
-        return "http://localhost:5000";
-    }
-
-    return window.location.origin;
-})();
+const BASE = "https://full-health-record-system.onrender.com";
 const THEME_STORAGE_KEY = "healthsys-theme";
 
 let chartInstance = null;
