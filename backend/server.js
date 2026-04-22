@@ -31,11 +31,6 @@ mongoose.connect(MONGO_URI)
     console.error("MongoDB connection error:", err.message);
   });
 
-/* ================= TEST ================= */
-app.get("/", (req, res) => {
-  res.send("Server Working");
-});
-
 /* ================= ROUTES ================= */
 app.use("/api/auth", authRoutes);
 app.use("/api/patient", patientRoutes);
@@ -50,7 +45,11 @@ app.post("/api/predict", protect, predictStructured);
 app.get("/api/predict/:age", protect, predictByAge);
 
 /* ================= FRONTEND ================= */
-app.use(express.static(path.join(__dirname, "..", "frontend")));
+app.use(express.static(path.join(__dirname, "../frontend")));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "../frontend/index.html"));
+});
 
 /* ================= SERVER ================= */
 app.listen(PORT, () => {
