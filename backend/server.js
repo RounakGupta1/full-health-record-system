@@ -19,7 +19,7 @@ const {
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/healthDB";
+const MONGO_URI = process.env.MONGO_URI;
 
 app.use(cors());
 app.use(express.json());
@@ -45,10 +45,16 @@ app.post("/api/predict", protect, predictStructured);
 app.get("/api/predict/:age", protect, predictByAge);
 
 /* ================= FRONTEND ================= */
-app.use(express.static(path.join(__dirname, "../frontend")));
 
+// Absolute path fix (important)
+const frontendPath = path.join(__dirname, "../frontend");
+
+// Serve static files
+app.use(express.static(frontendPath));
+
+// Catch-all route (must be LAST)
 app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../frontend/index.html"));
+  res.sendFile(path.join(frontendPath, "index.html"));
 });
 
 /* ================= SERVER ================= */
