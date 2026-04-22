@@ -38,6 +38,7 @@ exports.registerUser = async (req, res) => {
       token: generateToken(user._id),
     });
   } catch (err) {
+    console.error("Register error:", err);
     res.status(500).json({ msg: "Register error" });
   }
 };
@@ -64,6 +65,7 @@ exports.loginUser = async (req, res) => {
       res.status(400).json({ msg: "Invalid credentials" });
     }
   } catch (err) {
+    console.error("Login error:", err);
     res.status(500).json({ msg: "Login error" });
   }
 };
@@ -73,9 +75,8 @@ const hashResetToken = (token) => {
   return crypto.createHash("sha256").update(token).digest("hex");
 };
 
-/* ================= RESET LINK (FIXED) ================= */
+/* ================= RESET LINK ================= */
 const getResetLink = (token) => {
-  // ✅ FORCE PRODUCTION URL (IMPORTANT)
   const clientUrl =
     process.env.CLIENT_URL ||
     process.env.FRONTEND_URL ||
@@ -100,19 +101,25 @@ exports.forgotPassword = async (req, res) => {
 
         await user.save({ validateBeforeSave: false });
 
+        const resetLink = getResetLink(resetToken);
+
+        // 🔥 DEBUG LINE (IMPORTANT)
+        console.log("RESET LINK:", resetLink);
+
         try {
           await sendPasswordResetEmail({
             to: user.email,
-            resetLink: getResetLink(resetToken),
+            resetLink: resetLink,
           });
         } catch (emailError) {
-          console.error("Email failed:", emailError.message);
+          console.error("❌ Email failed:", emailError);
         }
       }
     }
 
     return res.json({ msg: GENERIC_RESET_MESSAGE });
   } catch (err) {
+    console.error("Forgot password error:", err);
     return res.status(500).json({ msg: "Unable to process password reset request" });
   }
 };
@@ -146,6 +153,7 @@ exports.resetPassword = async (req, res) => {
 
     return res.json({ msg: "Password reset successful" });
   } catch (err) {
+    console.error("Reset password error:", err);
     return res.status(500).json({ msg: "Unable to reset password" });
   }
 };
