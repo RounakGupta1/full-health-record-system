@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HealthSys</title>
+<script>
+(function(){
+    var storedTheme = localStorage.getItem("healthsys-theme");
+    var theme = storedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body class="landing-page">
+
+<!-- LOADER -->
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
+<!-- NAVBAR -->
+<header class="navbar">
+    <a class="brand" href="index.html">
+        <span class="brand-mark">H</span>
+        <span>HealthSys</span>
+    </a>
+    <nav class="nav-actions" aria-label="Primary navigation">
+        <button class="theme-toggle" type="button" data-theme-toggle>Dark mode</button>
+        <a href="login.html" class="nav-link">Login</a>
+    </nav>
+</header>
+
+<!-- HERO -->
+<main>
+    <section class="hero hidden" aria-label="HealthSys overview">
+        <div class="hero-content">
+            <p class="eyebrow">Digital health records</p>
+            <h1>Smart healthcare management for faster decisions.</h1>
+            <p class="hero-copy">Manage patient data, review analytics, and run health risk checks in one polished workspace.</p>
+            <a href="login.html" class="btn">Get Started</a>
+        </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats hidden" aria-label="Platform stats">
+        <div>
+            <h2>1000+</h2>
+            <p>Patients Managed</p>
+        </div>
+        <div>
+            <h2>99%</h2>
+            <p>Accuracy</p>
+        </div>
+        <div>
+            <h2>24/7</h2>
+            <p>Monitoring</p>
+        </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features" aria-label="Features">
+        <article class="card hidden">
+            <i class="fas fa-lock icon" aria-hidden="true"></i>
+            <h3>Secure System</h3>
+            <p>JWT authentication and encrypted password storage protect access.</p>
+        </article>
+
+        <article class="card hidden">
+            <i class="fas fa-chart-bar icon" aria-hidden="true"></i>
+            <h3>Analytics</h3>
+            <p>Real-time patient charts help your records stay easy to read.</p>
+        </article>
+
+        <article class="card hidden">
+            <i class="fas fa-robot icon" aria-hidden="true"></i>
+            <h3>AI Prediction</h3>
+            <p>Quick health risk checks keep useful insights close to the workflow.</p>
+        </article>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="about hidden">
+        <p class="eyebrow">Built for clarity</p>
+        <h2>Records, analytics, and AI support in one calm workspace.</h2>
+        <p>
+            HealthSys keeps patient management focused with clean screens,
+            readable data, and a dashboard designed for daily use.
+        </p>
+    </section>
+</main>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <p>Copyright 2026 HealthSys | Built by You</p>
+</footer>
+
+<script src="script.js"></script>
+<script>
+const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+        if(entry.isIntersecting){
+            entry.target.classList.add("show");
+        }
+    });
+});
+
+document.querySelectorAll(".hidden").forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>

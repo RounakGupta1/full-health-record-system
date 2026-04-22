@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Health Dashboard</title>
+<script>
+(function(){
+    var storedTheme = localStorage.getItem("healthsys-theme");
+    var theme = storedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="a.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <a class="brand" href="index.html">
+        <span class="brand-mark">H</span>
+        <span>HealthSys</span>
+    </a>
+    <p class="sidebar-copy">Records, analytics, and AI support in one workspace.</p>
+    <button class="logout-button" onclick="logout()">Logout</button>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+    <header class="dashboard-header">
+        <div>
+            <p class="eyebrow">Clinical overview</p>
+            <h1>Dashboard</h1>
+        </div>
+        <button class="theme-toggle" type="button" data-theme-toggle>Dark mode</button>
+    </header>
+
+    <!-- ADD PATIENT -->
+    <section class="card add-card">
+        <div class="section-heading">
+            <p class="eyebrow">New record</p>
+            <h3>Add Patient</h3>
+        </div>
+        <input id="pname" placeholder="Name">
+        <input id="page" type="number" min="0" placeholder="Age">
+        <input id="pdisease" placeholder="Disease">
+        <button onclick="addPatient()">Add Patient</button>
+    </section>
+
+    <!-- AI -->
+    <section class="card insight-card">
+        <div class="section-heading">
+            <p class="eyebrow">Risk check</p>
+            <h3>AI Prediction</h3>
+        </div>
+        <p>Use age, symptoms, and medical history for a context-aware risk prediction.</p>
+        <input id="riskAge" type="number" min="0" max="130" placeholder="Age">
+        <textarea id="riskSymptoms" rows="3" placeholder="Symptoms, e.g. fever, cough, chest pain"></textarea>
+        <textarea id="riskHistory" rows="3" placeholder="History, e.g. diabetes, hypertension, smoking"></textarea>
+        <button id="predictButton" onclick="predict()">Run AI</button>
+        <div id="predictionLoader" class="prediction-loader" hidden>
+            <span class="mini-spinner"></span>
+            <span>Analyzing patient profile...</span>
+        </div>
+        <div id="predictionResult" class="prediction-result" hidden></div>
+    </section>
+
+    <!-- PATIENT LIST -->
+    <section class="card patients-card">
+        <div class="section-heading">
+            <p class="eyebrow">Records</p>
+            <h3>Patients</h3>
+        </div>
+        <div id="list"></div>
+    </section>
+
+    <!-- ANALYTICS -->
+    <section class="card analytics-card">
+        <div class="section-heading">
+            <p class="eyebrow">Analytics</p>
+            <h3>Age Distribution</h3>
+        </div>
+        <canvas id="chart"></canvas>
+    </section>
+</main>
+
+<!-- SCRIPTS -->
+<script src="script.js"></script>
+
+<script>
+if(checkAuth()){
+    refreshDashboard();
+}
+</script>
+
+</body>
+</html>

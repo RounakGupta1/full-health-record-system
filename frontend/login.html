@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HealthSys Login</title>
+<script>
+(function(){
+    var storedTheme = localStorage.getItem("healthsys-theme");
+    var theme = storedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+
+<body class="auth-page">
+
+<!-- LOADER -->
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
+<header class="auth-header">
+    <a class="brand" href="index.html">
+        <span class="brand-mark">H</span>
+        <span>HealthSys</span>
+    </a>
+    <button class="theme-toggle" type="button" data-theme-toggle>Dark mode</button>
+</header>
+
+<main class="login-shell">
+    <!-- LEFT SIDE (IMAGE / BRANDING) -->
+    <section class="login-left" aria-label="HealthSys summary">
+        <div class="visual-panel">
+            <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=1200&q=80" alt="Doctor using a digital healthcare system">
+            <div class="visual-copy">
+                <p class="eyebrow">Secure digital health</p>
+                <h1>Patient records with a calmer rhythm.</h1>
+                <p>Sign in to manage records, analytics, and risk checks from one responsive dashboard.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- RIGHT SIDE (FORM) -->
+    <section class="login-right" aria-label="Authentication form">
+        <div class="form-box show">
+            <p class="eyebrow">Welcome back</p>
+            <h2>Access HealthSys</h2>
+            <p class="form-copy">Use your email and password to continue, or create an account with the same form.</p>
+
+            <label class="input-group" for="name">
+                <i class="fas fa-user" aria-hidden="true"></i>
+                <input id="name" placeholder="Name">
+            </label>
+
+            <label class="input-group" for="email">
+                <i class="fas fa-envelope" aria-hidden="true"></i>
+                <input id="email" type="email" placeholder="Email">
+            </label>
+
+            <label class="input-group" for="password">
+                <i class="fas fa-lock" aria-hidden="true"></i>
+                <input id="password" type="password" placeholder="Password">
+            </label>
+
+            <button class="btn" onclick="login()">Login</button>
+            <a class="form-link" href="forgot-password.html">Forgot Password?</a>
+            <button class="btn secondary" onclick="register()">Register</button>
+        </div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+
+</body>
+</html>
