@@ -7,14 +7,14 @@ const JWT_SECRET = process.env.JWT_SECRET || "secretkey";
 const RESET_TOKEN_EXPIRY_MINUTES = 15;
 const GENERIC_RESET_MESSAGE = "If an account with that email exists, a password reset link has been sent.";
 
-// Generate Token
+/* ================= TOKEN ================= */
 const generateToken = (id) => {
   return jwt.sign({ id: String(id) }, JWT_SECRET, {
     expiresIn: "1d",
   });
 };
 
-// Register
+/* ================= REGISTER ================= */
 exports.registerUser = async (req, res) => {
   let { name, email, password } = req.body;
 
@@ -38,15 +38,11 @@ exports.registerUser = async (req, res) => {
       token: generateToken(user._id),
     });
   } catch (err) {
-    if (err.code === 11000) {
-      return res.status(409).json({ msg: "User already exists" });
-    }
-
     res.status(500).json({ msg: "Register error" });
   }
 };
 
-// Login
+/* ================= LOGIN ================= */
 exports.loginUser = async (req, res) => {
   let { email, password } = req.body;
 
@@ -72,16 +68,23 @@ exports.loginUser = async (req, res) => {
   }
 };
 
+/* ================= TOKEN HASH ================= */
 const hashResetToken = (token) => {
   return crypto.createHash("sha256").update(token).digest("hex");
 };
 
+/* ================= RESET LINK (FIXED) ================= */
 const getResetLink = (token) => {
-  const clientUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL || `http://localhost:${process.env.PORT || 5000}`;
+  // ✅ FORCE PRODUCTION URL (IMPORTANT)
+  const clientUrl =
+    process.env.CLIENT_URL ||
+    process.env.FRONTEND_URL ||
+    "https://full-health-record-system.onrender.com";
+
   return `${clientUrl.replace(/\/$/, "")}/reset-password.html?token=${encodeURIComponent(token)}`;
 };
 
-// Forgot Password
+/* ================= FORGOT PASSWORD ================= */
 exports.forgotPassword = async (req, res) => {
   try {
     const email = String(req.body.email || "").trim().toLowerCase();
@@ -103,7 +106,7 @@ exports.forgotPassword = async (req, res) => {
             resetLink: getResetLink(resetToken),
           });
         } catch (emailError) {
-          console.error("Password reset email failed:", emailError.message);
+          console.error("Email failed:", emailError.message);
         }
       }
     }
@@ -114,17 +117,18 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-// Reset Password
+/* ================= RESET PASSWORD ================= */
 exports.resetPassword = async (req, res) => {
   try {
     const token = String(req.body.token || "").trim();
     const password = String(req.body.password || "");
 
     if (!token || !password || password.length < 6) {
-      return res.status(400).json({ msg: "Token and a password of at least 6 characters are required" });
+      return res.status(400).json({ msg: "Token and valid password required" });
     }
 
     const hashedToken = hashResetToken(token);
+
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
       resetPasswordExpires: { $gt: new Date() },
@@ -140,7 +144,7 @@ exports.resetPassword = async (req, res) => {
 
     await user.save();
 
-    return res.json({ msg: "Password reset successful. You can now login." });
+    return res.json({ msg: "Password reset successful" });
   } catch (err) {
     return res.status(500).json({ msg: "Unable to reset password" });
   }
