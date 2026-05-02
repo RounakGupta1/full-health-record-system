@@ -7,6 +7,9 @@ const hasSmtpConfig = () => Boolean(
 );
 const nodemailer = require("nodemailer");
 
+const hasSmtpConfig = () =>
+  Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
+
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
