@@ -15,16 +15,6 @@ const createTransporter = () =>
     },
   });
 
-const transporter = createTransporter();
-
-transporter.verify((error) => {
-  if (error) {
-    console.log("SMTP ERROR:", error);
-  } else {
-    console.log("SMTP READY");
-  }
-});
-
 const sendPasswordResetEmail = async ({ to, resetLink }) => {
   const appName = process.env.APP_NAME || "HealthSys";
 
