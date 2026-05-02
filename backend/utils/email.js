@@ -1,37 +1,43 @@
 const nodemailer = require("nodemailer");
 
-const hasSmtpConfig = () => Boolean(
-  process.env.SMTP_HOST &&
-  process.env.SMTP_USER &&
-  process.env.SMTP_PASS
-);
-const nodemailer = require("nodemailer");
-
 const hasSmtpConfig = () =>
   Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
 
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
-});
+const createTransporter = () =>
+  nodemailer.createTransport({
+    service: "gmail",
+    auth: {
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS,
+    },
+  });
 
-transporter.verify((error, success) => {
+const transporter = createTransporter();
+
+transporter.verify((error) => {
   if (error) {
     console.log("SMTP ERROR:", error);
   } else {
     console.log("SMTP READY");
   }
 });
+
 const sendPasswordResetEmail = async ({ to, resetLink }) => {
   const appName = process.env.APP_NAME || "HealthSys";
-  const from = process.env.SMTP_FROM || `"${appName}" <no-reply@healthsys.local>`;
+
+  const from =
+    process.env.SMTP_FROM ||
+    `"${appName}" <${process.env.SMTP_USER}>`;
 
   if (!hasSmtpConfig()) {
-    console.log(`[DEV PASSWORD RESET LINK] ${to}: ${resetLink}`);
-    return { sent: false, devLink: resetLink };
+    console.log(
+      `[DEV PASSWORD RESET LINK] ${to}: ${resetLink}`
+    );
+
+    return {
+      sent: false,
+      devLink: resetLink,
+    };
   }
 
   const transporter = createTransporter();
@@ -48,6 +54,7 @@ const sendPasswordResetEmail = async ({ to, resetLink }) => {
       "",
       "If you did not request this, you can ignore this email.",
     ].join("\n"),
+
     html: `
       <p>You requested a password reset for <strong>${appName}</strong>.</p>
       <p>Open this link within 15 minutes:</p>
