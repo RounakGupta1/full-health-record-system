@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard</title>
+<script>
+(function(){
+    var storedTheme = localStorage.getItem("healthsys-theme");
+    var theme = storedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="a.css">
+</head>
+<body class="dashboard-admin">
+<!-- LOADER -->
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sidebar-top">
+        <a class="brand" href="index.html">
+            <span class="brand-mark">H</span>
+            <span>HealthSys</span>
+        </a>
+        <button class="icon-btn" type="button" data-sidebar-toggle aria-label="Toggle navigation">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+
+    <p class="sidebar-copy">Admin-only governance · approvals · directory · no patient or clinician care flows.</p>
+
+    <nav class="nav" aria-label="Primary sidebar">
+        <a href="admin-dashboard.html" class="active">
+            <span class="dot"></span>
+            <span>Dashboard</span>
+        </a>
+        <a href="admin-dashboard.html#appointments-admin">
+            <span class="dot" style="background:var(--secondary)"></span>
+            <span>Appointments</span>
+        </a>
+        <a href="admin-dashboard.html#admin-profile">
+            <span class="dot" style="background:var(--primary)"></span>
+            <span>Profile</span>
+        </a>
+        <a href="admin-dashboard.html#reports-admin">
+            <span class="dot" style="background:var(--warning)"></span>
+            <span>Reports</span>
+        </a>
+        <div class="nav-section" style="margin-top:14px;">
+            <div class="nav-title">More</div>
+            <a href="admin-dashboard.html#adminDirectoryRoot"><span class="dot"></span><span>Directory</span></a>
+            <a href="admin-dashboard.html#analytics"><span class="dot"></span><span>Analytics</span><span class="badge">Soon</span></a>
+            <a href="admin-dashboard.html#logs"><span class="dot"></span><span>Activity logs</span><span class="badge">Soon</span></a>
+        </div>
+    </nav>
+
+    <button class="logout-button" onclick="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Logout
+    </button>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <div>
+                <p class="eyebrow">Administration portal</p>
+                <h2 style="font-family:'Poppins','Inter',sans-serif;line-height:1.1;">Trust operations</h2>
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <button class="icon-btn" type="button" title="Notifications (coming soon)">
+                <i class="fa-regular fa-bell"></i>
+            </button>
+            <button class="theme-toggle" type="button" data-theme-toggle>Dark mode</button>
+            <div class="profile" aria-label="Profile">
+                <div class="avatar" aria-hidden="true"></div>
+                <div>
+                    <strong data-profile-name>Admin</strong>
+                    <small data-profile-role>admin</small>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="stats" aria-label="Quick stats">
+        <div class="stat-card">
+            <div class="stat-left">
+                <span>Total users</span>
+                <strong id="adminStatTotal">—</strong>
+            </div>
+            <div class="stat-icon"><i class="fa-solid fa-users"></i></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-left">
+                <span>Doctors</span>
+                <strong id="adminStatDoctors">—</strong>
+            </div>
+            <div class="stat-icon secondary"><i class="fa-solid fa-user-doctor"></i></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-left">
+                <span>Patients</span>
+                <strong id="adminStatPatients">—</strong>
+            </div>
+            <div class="stat-icon warning"><i class="fa-solid fa-bed-pulse"></i></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-left">
+                <span>Pending doctors</span>
+                <strong id="adminStatPending">—</strong>
+            </div>
+            <div class="stat-icon danger"><i class="fa-solid fa-shield-halved"></i></div>
+        </div>
+    </section>
+
+    <section class="card dash-surface-accent-admin" id="appointments-admin" style="margin-bottom:22px;">
+        <div class="section-heading">
+            <p class="eyebrow">Appointments</p>
+            <h3>Fleet utilization</h3>
+        </div>
+        <p style="color:var(--muted);font-weight:700;">Cross-clinic scheduling oversight: aggregate counts roll up once appointment analytics middleware ships. Refresh the directory to sync pending clinician access first.</p>
+        <button type="button" class="btn-soft" disabled title="Planned milestone">Export appointment CSV</button>
+    </section>
+
+    <section class="grid-2">
+        <div class="stack" id="adminDirectoryRoot">
+            <section class="card">
+                <div class="section-heading">
+                    <p class="eyebrow">Directory</p>
+                    <h3>Live accounts &amp; access</h3>
+                </div>
+                <p style="color:var(--muted);font-weight:700;margin-bottom:12px;">Fed from MongoDB (<code style="font-size:0.86rem;">GET /api/admin/users</code>). Approve new doctors before they can sign in.</p>
+                <div class="admin-directory-toolbar" aria-label="Filter directory">
+                    <div class="admin-search-row">
+                        <div class="admin-search-field-wrap" role="search">
+                            <i class="fa-solid fa-magnifying-glass admin-search-icon" aria-hidden="true"></i>
+                            <input type="search" id="adminUserSearchInput" class="admin-search-input" placeholder="Search by name, email, or role…" autocomplete="off" aria-label="Search users">
+                            <button type="button" class="btn-soft admin-search-clear" id="adminUserSearchClear" title="Clear search" aria-label="Clear search">Clear</button>
+                        </div>
+                        <label class="admin-role-filter-label"><span class="sr-only">Filter by role</span>
+                            <select id="adminUserRoleFilter" class="admin-role-select" aria-label="Filter by role">
+                                <option value="all" selected>All</option>
+                                <option value="admin">Admin</option>
+                                <option value="doctor">Doctor</option>
+                                <option value="patient">Patient</option>
+                            </select>
+                        </label>
+                    </div>
+                </div>
+                <div id="adminUsersTable"></div>
+                <button class="btn-soft" type="button" onclick="loadAdminDashboard()" style="margin-top:14px;">Refresh directory</button>
+            </section>
+
+            <section class="card" id="analytics">
+                <div class="section-heading">
+                    <p class="eyebrow">Analytics</p>
+                    <h3>Fleet health</h3>
+                </div>
+                <p style="color:var(--muted);font-weight:700;">Snapshot metrics above rebuild automatically whenever the directory refreshes. Next up: cohort charts fed from appointment aggregates.</p>
+            </section>
+        </div>
+
+        <div class="stack" id="admin-profile-stack">
+            <section class="card" id="admin-profile">
+                <div class="section-heading">
+                    <p class="eyebrow">Account</p>
+                    <h3>Administrator profile</h3>
+                </div>
+                <p style="color:var(--muted);font-weight:700;">Signed in as <strong data-profile-name>Admin</strong> · <span data-profile-role style="color:var(--primary);">admin</span></p>
+                <p style="color:var(--muted);font-size:0.9rem;">Prefer dedicated admin MFA and IP allowlisting in production (Render + Atlas).</p>
+            </section>
+
+            <section class="card dash-surface-accent-admin" id="reports-admin">
+                <div class="section-heading">
+                    <p class="eyebrow">Reports</p>
+                    <h3>Compliance &amp; access exports</h3>
+                </div>
+                <p style="color:var(--muted);font-weight:700;">HIPAA-oriented audit bundles: user roster snapshots, blocked accounts, pending approvals.</p>
+                <button type="button" class="btn-soft" disabled title="Soon">Generate compliance pack</button>
+            </section>
+
+            <section class="card" id="logs">
+                <div class="section-heading">
+                    <p class="eyebrow">Controls</p>
+                    <h3>Safety playbook</h3>
+                </div>
+                <ul style="padding-left:20px;color:var(--muted);font-weight:700;line-height:1.85;">
+                    <li>Approve only verified clinicians.</li>
+                    <li>Use Block for compromised accounts—not delete.</li>
+                    <li>Rotate JWT secrets quarterly and scope Mongo IP allowlists.</li>
+                    <li>MFA for admins is slated for next security milestone.</li>
+                </ul>
+            </section>
+
+            <section class="card">
+                <div class="section-heading">
+                    <p class="eyebrow">Separation model</p>
+                    <h3>Why portals differ</h3>
+                </div>
+                <p style="color:var(--muted);font-weight:700;">Patients, doctors, and administrators each authenticate from their own URLs so tokens never silently land inside the wrong experience—HealthSys rejects cross-portal credential reuse at sign-in.</p>
+            </section>
+        </div>
+    </section>
+</main>
+
+<div id="adminDeleteUserModal" class="doctor-modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="adminDeleteModalTitle">
+    <div class="modal-sheet card" style="max-width:460px;">
+        <p class="eyebrow" style="margin-bottom:6px;">Danger zone</p>
+        <h3 id="adminDeleteModalTitle" style="font-family:'Poppins','Inter',sans-serif;margin-bottom:12px;">Confirm deletion</h3>
+        <p id="adminDeleteModalText" style="color:var(--muted);font-weight:700;line-height:1.55;margin-bottom:22px;">Are you sure you want to permanently delete this account?</p>
+        <div class="admin-delete-modal-actions">
+            <button type="button" class="btn-soft" data-admin-delete-cancel>Cancel</button>
+            <button type="button" class="btn-admin-delete-confirm" data-admin-delete-confirm>Delete permanently</button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+bootstrapDashboard("admin").then(function(ok){
+    if(ok){
+        loadAdminDashboard();
+    }
+});
+</script>
+</body>
+</html>

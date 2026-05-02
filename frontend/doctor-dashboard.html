@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor Dashboard</title>
+<script>
+(function(){
+    var storedTheme = localStorage.getItem("healthsys-theme");
+    var theme = storedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="a.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="dashboard-doctor">
+<!-- LOADER -->
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sidebar-top">
+        <a class="brand" href="index.html">
+            <span class="brand-mark">H</span>
+            <span>HealthSys</span>
+        </a>
+        <button class="icon-btn" type="button" data-sidebar-toggle aria-label="Toggle navigation">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+
+    <p class="sidebar-copy">Doctor-exclusive · JWT role guard · no cross-portal bleed-through.</p>
+
+    <nav class="nav" aria-label="Primary sidebar">
+        <a href="doctor-dashboard.html" class="active">
+            <span class="dot"></span>
+            <span>Dashboard</span>
+        </a>
+        <a href="doctor-dashboard.html#incoming">
+            <span class="dot" style="background:var(--secondary)"></span>
+            <span>Appointments</span>
+        </a>
+        <a href="doctor-dashboard.html#doctor-profile">
+            <span class="dot" style="background:var(--primary)"></span>
+            <span>Profile</span>
+        </a>
+        <a href="doctor-dashboard.html#reports-doctor">
+            <span class="dot" style="background:var(--warning)"></span>
+            <span>Reports</span>
+        </a>
+        <div class="nav-section" style="margin-top:14px;">
+            <div class="nav-title">More</div>
+            <a href="doctor-dashboard.html#schedule-confirmed"><span class="dot"></span><span>Schedule</span></a>
+            <a href="doctor-dashboard.html#prescriptions"><span class="dot"></span><span>Prescriptions</span></a>
+            <a href="doctor-dashboard.html#growth"><span class="dot"></span><span>Growth</span></a>
+        </div>
+    </nav>
+
+    <button class="logout-button" onclick="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Logout
+    </button>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <div>
+                <p class="eyebrow">Doctor portal</p>
+                <h2 style="font-family:'Poppins','Inter',sans-serif;line-height:1.1;">Clinical operations desk</h2>
+            </div>
+            <div class="search" role="search">
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true" style="color:var(--muted)"></i>
+                <input id="doctorSearchFilter" type="search" placeholder="Filter patients in queue…" aria-label="Filter">
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <button class="icon-btn" type="button" aria-label="Notifications">
+                <i class="fa-regular fa-bell"></i>
+            </button>
+            <button class="theme-toggle" type="button" data-theme-toggle>Dark mode</button>
+            <div class="profile" aria-label="Profile">
+                <div class="avatar" aria-hidden="true"></div>
+                <div>
+                    <strong data-profile-name>Doctor</strong>
+                    <small data-profile-role>doctor</small>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="stats" aria-label="Operational summary">
+        <div class="stat-card">
+            <div class="stat-left">
+                <span>Pending requests</span>
+                <strong id="doctorStatPending">—</strong>
+            </div>
+            <div class="stat-icon warning"><i class="fa-solid fa-inbox"></i></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-left">
+                <span>Confirmed visits</span>
+                <strong id="doctorStatApproved">—</strong>
+            </div>
+            <div class="stat-icon secondary"><i class="fa-solid fa-calendar-check"></i></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-left">
+                <span>This month</span>
+                <strong id="doctorStatMonthly">—</strong>
+            </div>
+            <div class="stat-icon"><i class="fa-solid fa-chart-line"></i></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-left">
+                <span>Patients (active records)</span>
+                <strong id="doctorStatPatients">—</strong>
+            </div>
+            <div class="stat-icon danger"><i class="fa-solid fa-users"></i></div>
+        </div>
+    </section>
+
+    <section class="grid-2">
+        <div class="stack" id="incoming">
+            <section class="card">
+                <div class="section-heading">
+                    <p class="eyebrow">Inbox</p>
+                    <h3>Patients awaiting acceptance</h3>
+                </div>
+                <div id="doctorAppointmentsList"></div>
+            </section>
+
+            <section class="card" id="schedule-confirmed">
+                <div class="section-heading">
+                    <p class="eyebrow">Schedule</p>
+                    <h3>Confirmed upcoming visits</h3>
+                </div>
+                <div id="doctorApprovedList"></div>
+            </section>
+        </div>
+
+        <div class="stack" id="growth">
+            <section class="card">
+                <div class="section-heading">
+                    <p class="eyebrow">Analytics</p>
+                    <h3>Visit volume trend</h3>
+                </div>
+                <p style="color:var(--muted);font-weight:700;">Rolling view of bookings linked to your practice (excluding cancelled).</p>
+                <canvas id="doctorGrowthChart"></canvas>
+            </section>
+
+            <section class="card" id="prescriptions">
+                <div class="section-heading">
+                    <p class="eyebrow">Clinical module</p>
+                    <h3>Prescriptions &amp; uploads</h3>
+                </div>
+                <p style="color:var(--muted);font-weight:700;">Issue e-prescriptions, attach PDFs or imaging, and export visit summaries once connected to your formulary.</p>
+                <p style="color:var(--muted);font-size:0.9rem;">Stub: no prescriptions issued from this build yet.</p>
+            </section>
+
+            <section class="card dash-surface-accent-doctor" id="reports-doctor">
+                <div class="section-heading">
+                    <p class="eyebrow">Reports</p>
+                    <h3>Rounds dossier export</h3>
+                </div>
+                <p style="color:var(--muted);font-weight:700;">Generate HIPAA-aware visit bundles for external rounds or teaching hospitals.</p>
+                <button type="button" class="btn-soft" disabled title="Soon">Compose multi-visit dossier</button>
+            </section>
+
+            <section class="card" id="doctor-profile">
+                <div class="section-heading">
+                    <p class="eyebrow">Account</p>
+                    <h3>Profile settings</h3>
+                </div>
+                <p style="color:var(--muted);font-weight:700;">Signed in as <strong data-profile-name-inline>—</strong> (<span data-profile-email-inline style="color:var(--primary);">—</span>).</p>
+                <p style="color:var(--muted);font-size:0.9rem;">Clinic affiliation and signature blocks will appear here in a future release.</p>
+            </section>
+        </div>
+    </section>
+</main>
+
+<div id="doctorPatientModal" class="doctor-modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="doctorModalTitle">
+    <div class="modal-sheet card">
+        <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px;">
+            <div>
+                <p class="eyebrow">Appointment detail</p>
+                <h3 id="doctorModalTitle">Patient</h3>
+                <p id="doctorModalMeta" style="color:var(--muted);font-weight:800;margin-top:8px;line-height:1.5;"></p>
+            </div>
+            <button class="btn-soft" type="button" onclick="closeDoctorModal()">Close</button>
+        </div>
+        <div class="doctor-modal-grid" style="margin-top:16px;display:grid;gap:12px;">
+            <div class="list-item">
+                <div><strong>Status</strong><small>Current workflow state</small></div>
+                <span id="doctorModalStatus"></span>
+            </div>
+            <div class="list-item">
+                <div><strong>Visit reason</strong><small id="doctorModalReason">—</small></div>
+            </div>
+            <div class="list-item">
+                <div><strong>Symptoms / notes</strong><small id="doctorModalSymptoms">—</small></div>
+            </div>
+            <div class="list-item">
+                <div><strong>Contact</strong><small id="doctorModalPhone">—</small></div>
+            </div>
+            <div class="list-item">
+                <div><strong>Patient profile</strong><small id="doctorModalDemo">—</small></div>
+            </div>
+        </div>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;justify-content:flex-end;margin-top:18px;">
+            <button id="doctorApproveBtn" type="button" onclick="approveSelectedAppointment()">Accept appointment</button>
+        </div>
+    </div>
+</div>
+
+<script src="script.js"></script>
+<script>
+bootstrapDashboard("doctor").then(function(ok){
+    if(!ok){
+        return;
+    }
+    document.querySelectorAll("[data-profile-name-inline]").forEach(function(el){
+        el.textContent = localStorage.getItem("userName") || "Doctor";
+    });
+    document.querySelectorAll("[data-profile-email-inline]").forEach(function(el){
+        el.textContent = localStorage.getItem("userEmail") || "—";
+    });
+    loadDoctorDashboard();
+});
+</script>
+</body>
+</html>

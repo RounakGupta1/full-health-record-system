@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient Dashboard</title>
+<script>
+(function(){
+    var storedTheme = localStorage.getItem("healthsys-theme");
+    var theme = storedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="a.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<body class="dashboard-patient">
+
+<!-- LOADER -->
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sidebar-top">
+        <a class="brand" href="index.html">
+            <span class="brand-mark">H</span>
+            <span>HealthSys</span>
+        </a>
+        <button class="icon-btn" type="button" data-sidebar-toggle aria-label="Toggle navigation">
+            <i class="fa-solid fa-bars"></i>
+        </button>
+    </div>
+
+    <p class="sidebar-copy">Distinct patient workspace · bookings · education · guarded by JWT role checks.</p>
+
+    <nav class="nav" aria-label="Primary sidebar">
+        <a href="patient-dashboard.html" class="active">
+            <span class="dot"></span>
+            <span>Dashboard</span>
+        </a>
+        <a href="patient-dashboard.html#appointment-book">
+            <span class="dot" style="background:var(--secondary)"></span>
+            <span>Appointments</span>
+        </a>
+        <a href="patient-dashboard.html#patient-profile">
+            <span class="dot" style="background:var(--primary)"></span>
+            <span>Profile</span>
+        </a>
+        <a href="patient-dashboard.html#reports-patient">
+            <span class="dot" style="background:var(--warning)"></span>
+            <span>Reports</span>
+        </a>
+        <div class="nav-section" style="margin-top:14px;">
+            <div class="nav-title">More</div>
+            <a href="patient-dashboard.html#history"><span class="dot"></span><span>History</span></a>
+            <a href="patient-dashboard.html#prescriptions-patient"><span class="dot"></span><span>Prescriptions</span></a>
+            <a href="patient-dashboard.html#risk"><span class="dot"></span><span>AI check</span></a>
+        </div>
+    </nav>
+
+    <button class="logout-button" onclick="logout()">
+        <i class="fa-solid fa-right-from-bracket"></i>
+        Logout
+    </button>
+</aside>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+    <header class="topbar">
+        <div class="topbar-left">
+            <div>
+                <p class="eyebrow">Patient portal</p>
+                <h2 style="font-family:'Poppins','Inter',sans-serif;line-height:1.1;">Your care timeline</h2>
+            </div>
+            <div class="search" role="search">
+                <i class="fa-solid fa-magnifying-glass" aria-hidden="true" style="color:var(--muted)"></i>
+                <input type="search" placeholder="Quick search appointments / doctors…" aria-label="Search">
+            </div>
+        </div>
+        <div class="topbar-actions">
+            <button class="icon-btn" type="button" aria-label="Notifications">
+                <i class="fa-regular fa-bell"></i>
+            </button>
+            <button class="theme-toggle" type="button" data-theme-toggle>Dark mode</button>
+            <div class="profile" aria-label="Profile">
+                <div class="avatar" aria-hidden="true"></div>
+                <div>
+                    <strong data-profile-name>Patient</strong>
+                    <small data-profile-role>patient</small>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section class="stats" aria-label="Appointment summary">
+        <div class="stat-card">
+            <div class="stat-left">
+                <span>Pending requests</span>
+                <strong id="patientStatPending">0</strong>
+            </div>
+            <div class="stat-icon warning"><i class="fa-solid fa-clock"></i></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-left">
+                <span>Confirmed visits</span>
+                <strong id="patientStatApproved">0</strong>
+            </div>
+            <div class="stat-icon secondary"><i class="fa-solid fa-circle-check"></i></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-left">
+                <span>Upcoming (active)</span>
+                <strong id="patientStatUpcoming">0</strong>
+            </div>
+            <div class="stat-icon"><i class="fa-solid fa-calendar-check"></i></div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-left">
+                <span>Open requests</span>
+                <strong id="patientStatOpen">0</strong>
+            </div>
+            <div class="stat-icon danger"><i class="fa-solid fa-stethoscope"></i></div>
+        </div>
+    </section>
+
+    <section class="grid-2">
+        <div class="stack">
+            <section class="card" id="appointment-next">
+                <div class="section-heading">
+                    <p class="eyebrow">Appointments</p>
+                    <h3>Next visit</h3>
+                </div>
+                <div id="patientNextAppointment"></div>
+            </section>
+
+            <section class="card">
+                <div class="section-heading">
+                    <p class="eyebrow">Care team</p>
+                    <h3>Available doctors</h3>
+                </div>
+                <div id="patientAvailableDoctors"></div>
+            </section>
+
+            <section class="card" id="appointment-book">
+                <div class="section-heading">
+                    <p class="eyebrow">Booking</p>
+                    <h3>Request an appointment</h3>
+                </div>
+                <p style="color:var(--muted);font-weight:700;margin-bottom:8px;">After you submit, your doctor accepts it—then it shows as confirmed here.</p>
+
+                <label class="booking-label">Doctor</label>
+                <select id="bookDoctor"></select>
+
+                <label class="booking-label">Preferred date &amp; time</label>
+                <input id="bookWhen" type="datetime-local">
+
+                <label class="booking-label">Visit reason (required)</label>
+                <input id="bookReason" placeholder="e.g. Chest discomfort, fever, medication review">
+
+                <label class="booking-label">Symptoms / details (recommended)</label>
+                <textarea id="bookSymptoms" rows="3" placeholder="What you are feeling since when, triggers, severity…"></textarea>
+
+                <label class="booking-label">Phone (required)</label>
+                <input id="bookPhone" type="tel" inputmode="tel" placeholder="+91xxxxxxxxxx">
+
+                <label class="booking-label">Your age (required)</label>
+                <input id="bookAge" type="number" min="0" max="130" placeholder="Age">
+
+                <label class="booking-label">Gender (required)</label>
+                <select id="bookGender">
+                    <option value="">Select</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+
+                <button id="bookButton" type="button" onclick="bookAppointment()">Submit request</button>
+            </section>
+
+            <section class="card" id="history">
+                <div class="section-heading">
+                    <p class="eyebrow">History</p>
+                    <h3>My appointments</h3>
+                </div>
+                <div id="patientAppointmentsList"></div>
+            </section>
+
+            <section class="card" id="prescriptions-patient">
+                <div class="section-heading">
+                    <p class="eyebrow">Medications</p>
+                    <h3>Prescriptions</h3>
+                </div>
+                <p style="color:var(--muted);font-weight:700;">After visit notes are issued, your clinician can publish prescriptions here. This section will list active medications and dosage instructions.</p>
+                <p style="color:var(--muted);font-size:0.9rem;">No prescriptions on file yet.</p>
+            </section>
+        </div>
+
+        <div class="stack">
+            <section class="card insight-card" id="risk">
+                <div class="section-heading">
+                    <p class="eyebrow">AI assistant</p>
+                    <h3>Risk check (education only)</h3>
+                </div>
+                <p style="color:var(--muted)">Pattern-based hints—not a diagnosis. Discuss results with your clinician.</p>
+                <input id="riskAge" type="number" min="0" max="130" placeholder="Age">
+                <textarea id="riskSymptoms" rows="3" placeholder="Symptoms, e.g. fever, cough, chest pain"></textarea>
+                <textarea id="riskHistory" rows="3" placeholder="History, e.g. diabetes, hypertension, smoking"></textarea>
+                <button id="predictButton" onclick="predict()">Run AI</button>
+                <div id="predictionLoader" class="prediction-loader" hidden>
+                    <span class="mini-spinner"></span>
+                    <span>Analyzing…</span>
+                </div>
+                <div id="predictionResult" class="prediction-result" hidden></div>
+            </section>
+
+            <section class="card">
+                <div class="section-heading">
+                    <p class="eyebrow">Care tips</p>
+                    <h3>Quick reminders</h3>
+                </div>
+                <ul style="padding-left:20px;color:var(--muted);font-weight:700;line-height:1.7;">
+                    <li>Bring ID and reports to approved visits.</li>
+                    <li>Update symptoms if anything changes.</li>
+                    <li>For emergencies, contact local emergency services.</li>
+                </ul>
+            </section>
+
+            <section class="card dash-surface-accent" id="reports-patient">
+                <div class="section-heading">
+                    <p class="eyebrow">Reports</p>
+                    <h3>Clinical exports</h3>
+                </div>
+                <p style="color:var(--muted);font-weight:700;">Aggregated summaries for labs &amp; imaging will appear once your provider publishes them.</p>
+                <button type="button" class="btn-soft" disabled title="Coming soon">Download PHI packet</button>
+            </section>
+
+            <section class="card" id="patient-profile">
+                <div class="section-heading">
+                    <p class="eyebrow">Account</p>
+                    <h3>Profile settings</h3>
+                </div>
+                <p style="color:var(--muted);font-weight:700;">Signed in as <strong data-profile-name-inline>—</strong> (<span data-profile-email-inline style="color:var(--primary);">—</span>).</p>
+                <p style="color:var(--muted);font-size:0.9rem;">Update display name and security options from this workspace in a future release. Use Logout to end your session on shared devices.</p>
+            </section>
+        </div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+<script>
+bootstrapDashboard("patient").then(function(ok){
+    if(!ok){
+        return;
+    }
+    document.querySelectorAll("[data-profile-name-inline]").forEach(function(el){
+        el.textContent = localStorage.getItem("userName") || "Patient";
+    });
+    document.querySelectorAll("[data-profile-email-inline]").forEach(function(el){
+        el.textContent = localStorage.getItem("userEmail") || "—";
+    });
+    loadPatientDashboard();
+});
+</script>
+
+</body>
+</html>

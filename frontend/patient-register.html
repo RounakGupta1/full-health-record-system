@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient registration | HealthSys</title>
+<script>
+(function(){
+    var storedTheme = localStorage.getItem("healthsys-theme");
+    var theme = storedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="a.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="auth-page auth-portal-patient">
+
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
+<header class="auth-header">
+    <a class="brand" href="index.html">
+        <span class="brand-mark" style="background:var(--patient-login-accent);">P</span>
+        <span>HealthSys</span>
+    </a>
+    <button class="theme-toggle" type="button" data-theme-toggle>Dark mode</button>
+</header>
+
+<main class="login-shell auth-portal-split">
+    <section class="login-left" aria-hidden="false">
+        <div class="visual-panel portal-visual-panel auth-card-animate-in">
+            <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80" alt="Wellness care">
+            <div class="visual-copy visual-copy-patient">
+                <p class="eyebrow" style="color:#ccfbf1;">New patient onboarding</p>
+                <h1>Create a secured patient profile tailored for appointments &amp; care coordination.</h1>
+                <p style="color:rgba(255,255,255,0.86);">All data travels over HTTPS-ready APIs with JWT authentication and audited access patterns.</p>
+            </div>
+        </div>
+    </section>
+    <section class="login-right">
+        <div class="form-box show portal-form-box portal-form-box-patient auth-card-animate-in">
+            <p class="eyebrow" style="color:var(--patient-login-accent);">Trusted registration</p>
+            <h2>Become a patient</h2>
+            <p class="form-copy auth-subcopy">We normalize email, encrypt passwords by default, and keep your profile HIPAA-minded at the UX layer.</p>
+
+            <form id="patientRegisterForm" autocomplete="off" novalidate>
+                <label class="input-group" for="patientRegName">
+                    <i class="fas fa-user" aria-hidden="true"></i>
+                    <input id="patientRegName" name="name" required maxlength="120" placeholder="Full name" autocomplete="name">
+                </label>
+                <label class="input-group" for="patientRegEmail">
+                    <i class="fas fa-envelope" aria-hidden="true"></i>
+                    <input id="patientRegEmail" type="email" required placeholder="Email" autocomplete="email">
+                </label>
+                <label class="input-group" for="patientRegPassword">
+                    <i class="fas fa-lock" aria-hidden="true"></i>
+                    <input id="patientRegPassword" type="password" required minlength="8" maxlength="128" placeholder="Password (letter + digit, 8+)" autocomplete="new-password">
+                </label>
+                <label class="input-group" for="patientRegAge">
+                    <i class="fas fa-hashtag" aria-hidden="true"></i>
+                    <input id="patientRegAge" type="number" min="0" max="130" required placeholder="Age">
+                </label>
+                <label class="input-group" for="patientRegGender">
+                    <i class="fas fa-venus-mars" aria-hidden="true"></i>
+                    <select id="patientRegGender" required>
+                        <option value="">Gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="other">Other</option>
+                    </select>
+                </label>
+                <label class="input-group" for="patientRegPhone">
+                    <i class="fas fa-phone" aria-hidden="true"></i>
+                    <input id="patientRegPhone" type="tel" inputmode="tel" maxlength="22" placeholder="Phone (digits only ok)" autocomplete="tel">
+                </label>
+                <label class="input-group" for="patientRegBloodGroup">
+                    <i class="fas fa-droplet" aria-hidden="true"></i>
+                    <select id="patientRegBloodGroup" required>
+                        <option value="">Blood group</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="unknown">Unknown</option>
+                    </select>
+                </label>
+
+                <button type="submit" class="btn btn-patient-accent btn-auth-gradient form-submit-enhanced" id="patientRegisterSubmit">Create secured account</button>
+            </form>
+
+            <a class="form-link" href="login-patient.html">Already have an account?</a>
+            <p class="portal-crosslinks">
+                <a href="login-doctor.html">Doctor sign-in →</a> · <a href="login-admin.html">Admin →</a> · <a href="login.html">Portals hub</a>
+            </p>
+        </div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

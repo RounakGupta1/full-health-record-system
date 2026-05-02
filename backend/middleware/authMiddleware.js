@@ -21,13 +21,26 @@ const protect = async (req, res, next) => {
       return res.status(401).json({ message: "Not authorized" });
     }
 
-    const user = await User.findById(decoded.id).select("_id").lean();
+    const user = await User.findById(decoded.id).select("_id role isApproved isBlocked").lean();
 
     if (!user) {
       return res.status(401).json({ message: "Not authorized" });
     }
 
+    if (decoded.role !== undefined && decoded.role !== user.role) {
+      return res.status(401).json({ message: "Not authorized" });
+    }
+
+    if (user.isBlocked) {
+      return res.status(403).json({ message: "Account is blocked" });
+    }
+
+    if (!user.isApproved) {
+      return res.status(403).json({ message: "Account pending admin approval" });
+    }
+
     req.user = String(user._id);
+    req.userRole = user.role;
 
     return next();
   } catch (error) {
@@ -35,4 +48,13 @@ const protect = async (req, res, next) => {
   }
 };
 
+const authorize = (...roles) => (req, res, next) => {
+  if (!req.userRole || !roles.includes(req.userRole)) {
+    return res.status(403).json({ message: "Forbidden" });
+  }
+
+  return next();
+};
+
 module.exports = protect;
+module.exports.authorize = authorize;

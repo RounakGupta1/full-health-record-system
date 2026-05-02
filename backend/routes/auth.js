@@ -1,19 +1,25 @@
 const router = require("express").Router();
+const protect = require("../middleware/authMiddleware");
 const {
-    registerUser,
-    loginUser,
-    forgotPassword,
-    resetPassword,
+  registerPatient,
+  registerDoctor,
+  loginUser,
+  getCurrentUser,
+} = require("../controllers/authController");
+const {
+  forgotPassword,
+  resetPassword,
 } = require("../controllers/autoController");
 
-/* REGISTER */
-router.post("/register", registerUser);
+router.post("/register/patient", registerPatient);
+router.post("/register/doctor", registerDoctor);
+router.post("/register", registerPatient);
 
-/* LOGIN */
 router.post("/login", loginUser);
 
-/* PASSWORD RESET */
 router.post("/forgot-password", forgotPassword);
 router.post("/reset-password", resetPassword);
+
+router.get("/me", protect, getCurrentUser);
 
 module.exports = router;

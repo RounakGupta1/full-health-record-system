@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doctor registration | HealthSys</title>
+<script>
+(function(){
+    var storedTheme = localStorage.getItem("healthsys-theme");
+    var theme = storedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="a.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="auth-page auth-portal-doctor">
+
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
+<header class="auth-header">
+    <a class="brand" href="index.html">
+        <span class="brand-mark" style="background:var(--doctor-login-accent);">D</span>
+        <span>HealthSys</span>
+    </a>
+    <button class="theme-toggle" type="button" data-theme-toggle>Dark mode</button>
+</header>
+
+<main class="login-shell auth-portal-split">
+    <section class="login-left">
+        <div class="visual-panel portal-visual-panel auth-card-animate-in">
+            <img src="https://images.unsplash.com/photo-1582719471384-894fbb16e074?auto=format&fit=crop&w=1200&q=80" alt="Clinical diagnostics">
+            <div class="visual-copy visual-copy-doctor">
+                <p class="eyebrow" style="color:#bfdbfe;">Join the medical staff network</p>
+                <h1>Submit your credentials securely. Administrators verify every clinician before unlocking sign-in.</h1>
+                <p style="color:rgba(255,255,255,0.85);">You will receive access only once an admin confirms your licence details.</p>
+            </div>
+        </div>
+    </section>
+    <section class="login-right">
+        <div class="form-box show portal-form-box portal-form-box-doctor auth-card-animate-in">
+            <p class="eyebrow" style="color:var(--doctor-login-accent);">Practitioner intake</p>
+            <h2>Register as a clinician</h2>
+            <p class="form-copy auth-subcopy">Passwords are hashed via bcrypt server-side before touching MongoDB. Expect a staging period while compliance reviews your licence.</p>
+
+            <form id="doctorRegisterForm" autocomplete="off" novalidate>
+                <label class="input-group" for="doctorRegName">
+                    <i class="fas fa-user-md" aria-hidden="true"></i>
+                    <input id="doctorRegName" maxlength="120" required placeholder="Full name" autocomplete="name">
+                </label>
+                <label class="input-group" for="doctorRegEmail">
+                    <i class="fas fa-envelope" aria-hidden="true"></i>
+                    <input id="doctorRegEmail" type="email" required placeholder="Work email">
+                </label>
+                <label class="input-group" for="doctorRegPassword">
+                    <i class="fas fa-lock" aria-hidden="true"></i>
+                    <input id="doctorRegPassword" type="password" required placeholder="Strong password (8+)" autocomplete="new-password">
+                </label>
+                <label class="input-group" for="doctorRegSpecialization">
+                    <i class="fas fa-kit-medical" aria-hidden="true"></i>
+                    <input id="doctorRegSpecialization" maxlength="120" required placeholder="Specialization">
+                </label>
+                <label class="input-group" for="doctorRegExperience">
+                    <i class="fas fa-chart-line" aria-hidden="true"></i>
+                    <input id="doctorRegExperience" type="number" min="0" max="65" required placeholder="Years of experience">
+                </label>
+                <label class="input-group" for="doctorRegPhone">
+                    <i class="fas fa-phone" aria-hidden="true"></i>
+                    <input id="doctorRegPhone" type="tel" autocomplete="tel" placeholder="Practice phone">
+                </label>
+                <label class="input-group" for="doctorRegLicense">
+                    <i class="fas fa-id-badge" aria-hidden="true"></i>
+                    <input id="doctorRegLicense" maxlength="64" required placeholder="Medical licence number" autocomplete="off">
+                </label>
+
+                <button type="submit" class="btn btn-doctor-accent btn-auth-gradient form-submit-enhanced" id="doctorRegisterSubmit">Submit credentials for review</button>
+            </form>
+
+            <a class="form-link" href="login-doctor.html">Return to clinician sign-in</a>
+            <p class="portal-crosslinks">
+                <a href="patient-register.html">Need a patient chart? Register →</a> · <a href="login.html">Portals hub</a>
+            </p>
+        </div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

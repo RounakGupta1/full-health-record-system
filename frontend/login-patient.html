@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Patient sign in | HealthSys</title>
+<script>
+(function(){
+    var storedTheme = localStorage.getItem("healthsys-theme");
+    var theme = storedTheme || (window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light");
+    document.documentElement.setAttribute("data-theme", theme);
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="a.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="auth-page auth-portal-patient" data-auth-portal="patient">
+
+<div id="loader">
+    <div class="spinner"></div>
+</div>
+
+<header class="auth-header">
+    <a class="brand" href="index.html">
+        <span class="brand-mark" style="background:var(--patient-login-accent);">P</span>
+        <span>HealthSys</span>
+    </a>
+    <button class="theme-toggle" type="button" data-theme-toggle>Dark mode</button>
+</header>
+
+<main class="login-shell auth-portal-split">
+    <section class="login-left" aria-label="Patient wellness">
+        <div class="visual-panel portal-visual-panel auth-card-animate-in">
+            <img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?auto=format&fit=crop&w=1200&q=80" alt="Calm wellness and care setting">
+            <div class="visual-copy visual-copy-patient">
+                <p class="eyebrow" style="color:#ccfbf1;">Your health journey</p>
+                <h1>Book visits, prescriptions context, and proactive education—without leaving this portal.</h1>
+                <p style="color:rgba(255,255,255,0.85);">Session tokens auto-expire while staying protected with bcrypt + JWT.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="login-right" aria-label="Patient authentication">
+        <div class="form-box show portal-form-box portal-form-box-patient auth-card-animate-in">
+            <p class="eyebrow" style="color:var(--patient-login-accent);">Patient portal</p>
+            <h2>Secure sign in</h2>
+            <p class="form-copy auth-subcopy">New here? Create your profile on the dedicated registration page first.</p>
+
+            <label class="input-group" for="email">
+                <i class="fas fa-envelope" aria-hidden="true"></i>
+                <input id="email" type="email" autocomplete="username" placeholder="Email">
+            </label>
+
+            <label class="input-group" for="password">
+                <i class="fas fa-lock" aria-hidden="true"></i>
+                <input id="password" type="password" autocomplete="current-password" placeholder="Password">
+            </label>
+
+            <button class="btn btn-patient-accent btn-auth-gradient form-submit-enhanced" type="button" onclick="login()">Sign in</button>
+            <a class="form-link" href="forgot-password.html">Forgot password?</a>
+            <a class="btn secondary" href="patient-register.html">Create patient account</a>
+
+            <p class="portal-crosslinks">
+                <a href="login-doctor.html">Clinician? Doctor portal →</a>
+                <span class="portal-crosslinks-split"> · </span>
+                <a href="login-admin.html">Administration →</a>
+                · <a href="login.html">All portals</a>
+            </p>
+        </div>
+    </section>
+</main>
+
+<script src="script.js"></script>
+</body>
+</html>

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HealthSys Login</title>
+<title>Choose your portal | HealthSys</title>
 <script>
 (function(){
     var storedTheme = localStorage.getItem("healthsys-theme");
@@ -14,13 +14,11 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="a.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
+<body class="auth-page login-hub-page" data-auth-portal="">
 
-<body class="auth-page">
-
-<!-- LOADER -->
 <div id="loader">
     <div class="spinner"></div>
 </div>
@@ -33,49 +31,53 @@
     <button class="theme-toggle" type="button" data-theme-toggle>Dark mode</button>
 </header>
 
-<main class="login-shell">
-    <!-- LEFT SIDE (IMAGE / BRANDING) -->
-    <section class="login-left" aria-label="HealthSys summary">
-        <div class="visual-panel">
-            <img src="https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?auto=format&fit=crop&w=1200&q=80" alt="Doctor using a digital healthcare system">
-            <div class="visual-copy">
-                <p class="eyebrow">Secure digital health</p>
-                <h1>Patient records with a calmer rhythm.</h1>
-                <p>Sign in to manage records, analytics, and risk checks from one responsive dashboard.</p>
-            </div>
-        </div>
+<main class="login-hub-main">
+    <section class="login-hub-intro">
+        <p class="eyebrow">Multi-portal workspace</p>
+        <h1>Pick where you belong</h1>
+        <p class="login-hub-lede">Patients, clinicians, and hospital administrators each get a tailored sign-in. Your role is enforced so the right dashboards always open.</p>
     </section>
 
-    <!-- RIGHT SIDE (FORM) -->
-    <section class="login-right" aria-label="Authentication form">
-        <div class="form-box show">
-            <p class="eyebrow">Welcome back</p>
-            <h2>Access HealthSys</h2>
-            <p class="form-copy">Use your email and password to continue, or create an account with the same form.</p>
+    <div class="portal-card-grid">
+        <a href="login-patient.html" class="portal-card portal-card-patient">
+            <span class="portal-card-badge">Patients</span>
+            <span class="portal-card-icon" aria-hidden="true"><i class="fa-solid fa-heart-pulse"></i></span>
+            <strong>Patient portal</strong>
+            <p>Book appointments, view history, prescriptions, and AI-assisted education tools.</p>
+            <span class="portal-card-cta">Continue as patient →</span>
+        </a>
 
-            <label class="input-group" for="name">
-                <i class="fas fa-user" aria-hidden="true"></i>
-                <input id="name" placeholder="Name">
-            </label>
+        <a href="login-doctor.html" class="portal-card portal-card-doctor">
+            <span class="portal-card-badge">Clinicians</span>
+            <span class="portal-card-icon" aria-hidden="true"><i class="fa-solid fa-stethoscope"></i></span>
+            <strong>Doctor portal</strong>
+            <p>Accept inbound visits, browse schedules, growth analytics, and prescription workspace.</p>
+            <span class="portal-card-cta">Continue as doctor →</span>
+        </a>
 
-            <label class="input-group" for="email">
-                <i class="fas fa-envelope" aria-hidden="true"></i>
-                <input id="email" type="email" placeholder="Email">
-            </label>
+        <a href="login-admin.html" class="portal-card portal-card-admin">
+            <span class="portal-card-badge">Operations</span>
+            <span class="portal-card-icon" aria-hidden="true"><i class="fa-solid fa-shield-halved"></i></span>
+            <strong>Administration</strong>
+            <p>Approve clinician accounts, block misuse, audit users—clinical tools stay out of scope here.</p>
+            <span class="portal-card-cta">Administrator sign-in →</span>
+        </a>
+    </div>
 
-            <label class="input-group" for="password">
-                <i class="fas fa-lock" aria-hidden="true"></i>
-                <input id="password" type="password" placeholder="Password">
-            </label>
+    <div class="portal-register-row" role="navigation" aria-label="New account registration">
+        <span class="portal-register-label">First visit?</span>
+        <a href="patient-register.html">Patient registration</a>
+        <span class="portal-dot-sep">·</span>
+        <a href="doctor-register.html">Clinician registration</a>
+    </div>
 
-            <button class="btn" onclick="login()">Login</button>
-            <a class="form-link" href="forgot-password.html">Forgot Password?</a>
-            <button class="btn secondary" onclick="register()">Register</button>
-        </div>
-    </section>
+    <p class="login-hub-foot">
+        <a href="forgot-password.html">Reset password</a>
+        ·
+        <a href="index.html">Back to home</a>
+    </p>
 </main>
 
 <script src="script.js"></script>
-
 </body>
 </html>

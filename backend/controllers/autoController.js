@@ -1,91 +1,30 @@
+/**
+ * Legacy barrel: password-reset flows only (auth/register/login moved to authController).
+ */
 const User = require("../models/User");
-const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 const { sendPasswordResetEmail } = require("../utils/email");
+const { validatePasswordStrength } = require("../middleware/registerValidation");
 
-const JWT_SECRET = process.env.JWT_SECRET || "secretkey";
 const RESET_TOKEN_EXPIRY_MINUTES = 15;
 const GENERIC_RESET_MESSAGE = "If an account with that email exists, a password reset link has been sent.";
 
-/* ================= TOKEN ================= */
-const generateToken = (id) => {
-  return jwt.sign({ id: String(id) }, JWT_SECRET, {
-    expiresIn: "1d",
-  });
-};
-
-/* ================= REGISTER ================= */
-exports.registerUser = async (req, res) => {
-  let { name, email, password } = req.body;
-
-  try {
-    if (!name || !email || !password) {
-      return res.status(400).json({ msg: "Fill all fields" });
-    }
-
-    name = name.trim();
-    email = email.trim().toLowerCase();
-
-    const existing = await User.findOne({ email });
-    if (existing) {
-      return res.status(409).json({ msg: "User already exists" });
-    }
-
-    const user = await User.create({ name, email, password });
-
-    res.json({
-      msg: "Registered Successfully",
-      token: generateToken(user._id),
-    });
-  } catch (err) {
-    console.error("Register error:", err);
-    res.status(500).json({ msg: "Register error" });
-  }
-};
-
-/* ================= LOGIN ================= */
-exports.loginUser = async (req, res) => {
-  let { email, password } = req.body;
-
-  try {
-    if (!email || !password) {
-      return res.status(400).json({ msg: "Fill all fields" });
-    }
-
-    email = email.trim().toLowerCase();
-
-    const user = await User.findOne({ email });
-
-    if (user && (await user.matchPassword(password))) {
-      res.json({
-        msg: "Login Successful",
-        token: generateToken(user._id),
-      });
-    } else {
-      res.status(400).json({ msg: "Invalid credentials" });
-    }
-  } catch (err) {
-    console.error("Login error:", err);
-    res.status(500).json({ msg: "Login error" });
-  }
-};
-
-/* ================= TOKEN HASH ================= */
 const hashResetToken = (token) => {
   return crypto.createHash("sha256").update(token).digest("hex");
 };
 
-/* ================= RESET LINK ================= */
 const getResetLink = (token) => {
   const clientUrl =
     process.env.CLIENT_URL ||
     process.env.FRONTEND_URL ||
-    "https://full-health-record-system.onrender.com";
+    "http://localhost:5000";
 
   return `${clientUrl.replace(/\/$/, "")}/reset-password.html?token=${encodeURIComponent(token)}`;
 };
 
-/* ================= FORGOT PASSWORD ================= */
+exports.hashResetToken = hashResetToken;
+exports.getResetLink = getResetLink;
+
 exports.forgotPassword = async (req, res) => {
   try {
     const email = String(req.body.email || "").trim().toLowerCase();
@@ -103,16 +42,17 @@ exports.forgotPassword = async (req, res) => {
 
         const resetLink = getResetLink(resetToken);
 
-        // 🔥 DEBUG LINE (IMPORTANT)
-        console.log("RESET LINK:", resetLink);
+        if (process.env.DEBUG_EMAIL === "1") {
+          console.log("RESET LINK:", resetLink);
+        }
 
         try {
           await sendPasswordResetEmail({
             to: user.email,
-            resetLink: resetLink,
+            resetLink,
           });
         } catch (emailError) {
-          console.error("❌ Email failed:", emailError);
+          console.error("Password reset email failed:", emailError);
         }
       }
     }
@@ -124,14 +64,15 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-/* ================= RESET PASSWORD ================= */
 exports.resetPassword = async (req, res) => {
   try {
     const token = String(req.body.token || "").trim();
-    const password = String(req.body.password || "");
+    const rawPassword = String(req.body.password || "");
 
-    if (!token || !password || password.length < 6) {
-      return res.status(400).json({ msg: "Token and valid password required" });
+    const pwdErr = validatePasswordStrength(rawPassword);
+
+    if (!token || pwdErr) {
+      return res.status(400).json({ msg: pwdErr || "Token and valid password required" });
     }
 
     const hashedToken = hashResetToken(token);
@@ -139,13 +80,13 @@ exports.resetPassword = async (req, res) => {
     const user = await User.findOne({
       resetPasswordToken: hashedToken,
       resetPasswordExpires: { $gt: new Date() },
-    }).select("+resetPasswordToken +resetPasswordExpires");
+    }).select("+resetPasswordToken +resetPasswordExpires +password");
 
     if (!user) {
       return res.status(400).json({ msg: "Reset link is invalid or expired" });
     }
 
-    user.password = password;
+    user.password = rawPassword.trim();
     user.resetPasswordToken = null;
     user.resetPasswordExpires = null;
 
