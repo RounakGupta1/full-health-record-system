@@ -9,13 +9,21 @@ const hasSmtpConfig = () => Boolean(
 const createTransporter = () => nodemailer.createTransport({
   host: process.env.SMTP_HOST,
   port: Number(process.env.SMTP_PORT) || 587,
-  secure: process.env.SMTP_SECURE === "true",
+  secure: false,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS,
   },
 });
+const transporter = createTransporter();
 
+transporter.verify((error, success) => {
+  if (error) {
+    console.log("SMTP ERROR:", error);
+  } else {
+    console.log("SMTP READY");
+  }
+});
 const sendPasswordResetEmail = async ({ to, resetLink }) => {
   const appName = process.env.APP_NAME || "HealthSys";
   const from = process.env.SMTP_FROM || `"${appName}" <no-reply@healthsys.local>`;
