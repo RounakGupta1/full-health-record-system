@@ -5,7 +5,10 @@ const hasSmtpConfig = () =>
 
 const createTransporter = () =>
   nodemailer.createTransport({
-    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    requireTLS: true,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
@@ -45,7 +48,9 @@ const sendPasswordResetEmail = async ({ to, resetLink }) => {
   await transporter.sendMail({
     from,
     to,
+
     subject: `${appName} password reset`,
+
     text: [
       `You requested a password reset for ${appName}.`,
       "",
