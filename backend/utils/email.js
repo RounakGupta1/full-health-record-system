@@ -1,8 +1,9 @@
-
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  service: "gmail",
+  host: process.env.SMTP_HOST,
+  port: Number(process.env.SMTP_PORT),
+  secure: false,
 
   auth: {
     user: process.env.SMTP_USER,
@@ -12,15 +13,13 @@ const transporter = nodemailer.createTransport({
 
 const sendPasswordResetEmail = async ({ to, resetLink }) => {
   await transporter.sendMail({
-    from: process.env.SMTP_USER,
-
+    from: process.env.SMTP_FROM,
     to,
-
     subject: "Password Reset",
 
     html: `
       <h2>Password Reset</h2>
-      <p>Click below to reset password:</p>
+      <p>Click below to reset your password:</p>
       <a href="${resetLink}">Reset Password</a>
     `,
   });
