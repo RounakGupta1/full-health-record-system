@@ -1,9 +1,6 @@
 const nodemailer = require("nodemailer");
-const dns = require("dns");
 
-dns.setDefaultResultOrder("ipv4first");
-
-const createTransporter = () => {
+const createTransporter = async () => {
   return nodemailer.createTransport({
     service: "gmail",
 
@@ -12,24 +9,21 @@ const createTransporter = () => {
       pass: process.env.SMTP_PASS,
     },
 
-    tls: {
-      rejectUnauthorized: false,
-    },
-
-    family: 4,
+    connectionTimeout: 60000,
+    greetingTimeout: 60000,
+    socketTimeout: 60000,
   });
 };
 
 const sendPasswordResetEmail = async ({ to, resetLink }) => {
-  const appName = process.env.APP_NAME || "HealthSys";
-
-  const transporter = createTransporter();
+  const transporter = await createTransporter();
 
   await transporter.sendMail({
-    from: `"${appName}" <${process.env.SMTP_USER}>`,
+    from: process.env.SMTP_USER,
+
     to,
 
-    subject: `${appName} Password Reset`,
+    subject: "Password Reset",
 
     text: `
 You requested a password reset.
@@ -40,7 +34,12 @@ ${resetLink}
 
     html: `
 <p>You requested a password reset.</p>
-<p><a href="${resetLink}">Reset Password</a></p>
+
+<p>
+  <a href="${resetLink}">
+    Reset Password
+  </a>
+</p>
 `,
   });
 
@@ -50,3 +49,4 @@ ${resetLink}
 module.exports = {
   sendPasswordResetEmail,
 };
+
