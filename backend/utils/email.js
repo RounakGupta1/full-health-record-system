@@ -1,32 +1,39 @@
-const nodemailer = require("nodemailer");
+const SibApiV3Sdk = require("sib-api-v3-sdk");
 
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: 587,
-  secure: false,
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
 
-  requireTLS: true,
+const apiKey =
+  defaultClient.authentications["api-key"];
 
-  auth: {
-    user: process.env.SMTP_USER,
-    pass: process.env.SMTP_PASS,
-  },
+apiKey.apiKey = process.env.BREVO_API_KEY;
 
-  tls: {
-    rejectUnauthorized: false,
-  },
-});
+const apiInstance =
+  new SibApiV3Sdk.TransactionalEmailsApi();
 
-const sendPasswordResetEmail = async ({ to, resetLink }) => {
-  await transporter.sendMail({
-    from: process.env.SMTP_FROM,
-    to,
+const sendPasswordResetEmail = async ({
+  to,
+  resetLink,
+}) => {
+  await apiInstance.sendTransacEmail({
+    sender: {
+      email: "rounak30gupta@gmail.com",
+      name: "HealthSys",
+    },
+
+    to: [
+      {
+        email: to,
+      },
+    ],
+
     subject: "Password Reset",
 
-    html: `
+    htmlContent: `
       <h2>Password Reset</h2>
       <p>Click below to reset your password:</p>
-      <a href="${resetLink}">Reset Password</a>
+      <a href="${resetLink}">
+        Reset Password
+      </a>
     `,
   });
 
