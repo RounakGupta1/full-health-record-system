@@ -3,35 +3,33 @@ const dns = require("dns");
 
 dns.setDefaultResultOrder("ipv4first");
 
-const hasSmtpConfig = () =>
-  Boolean(process.env.SMTP_USER && process.env.SMTP_PASS);
+const createTransporter = () => {
+  return nodemailer.createTransport({
+    service: "gmail",
 
-const createTransporter = () =>
-  nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    requireTLS: true,
-    family: 4,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS,
     },
+
+    tls: {
+      rejectUnauthorized: false,
+    },
+
+    family: 4,
   });
+};
 
 const sendPasswordResetEmail = async ({ to, resetLink }) => {
   const appName = process.env.APP_NAME || "HealthSys";
 
-  const from =
-    process.env.SMTP_FROM ||
-    `"${appName}" <${process.env.SMTP_USER}>`;
-
   const transporter = createTransporter();
 
   await transporter.sendMail({
-    from,
+    from: `"${appName}" <${process.env.SMTP_USER}>`,
     to,
-    subject: `${appName} password reset`,
+
+    subject: `${appName} Password Reset`,
 
     text: `
 You requested a password reset.
